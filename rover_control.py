@@ -52,21 +52,35 @@ ser = serial.Serial('/dev/serial0', 9600)
 
 def avoidF(distanceFL, distanceFM, distanceFR):
     if distanceFL > distanceFR:
-        execute_command(left, 90)
-        execute_command(fwd, 1)
-        execute_command(right, 90)
-        execute_command(fwd,2)
-        execute_command(right, 90)
-        execute_command(fwd, 1)
-        execute_command(left, 90)
+        counter=0
+        while distanceFR or distanceFL or distanceFM < 50:
+            execute_command(left, 10)
+            distanceFL = measure_distance(4, 18)
+            distanceFM = measure_distance(17, 23)
+            distanceFR = measure_distance(27, 24)
+            counter += 1
+            if counter == 9:
+                print("cannot go this way")
+                break
+        execute_command(fwd, 1.8)
+        execute_command(right, 2*counter*10)
+        execute_command(fwd,1.8)
+        execute_command(left,counter*10)
     elif distanceFL < distanceFR:
-        execute_command(right, 90)
-        execute_command(fwd, 1)
-        execute_command(left, 90)
-        execute_command(fwd,2)
-        execute_command(left, 90)
-        execute_command(fwd, 1)
-        execute_command(right, 90)
+        counter=0
+        while distanceFR or distanceFL or distanceFM < 50:
+            execute_command(right, 10)
+            distanceFL = measure_distance(4, 18)
+            distanceFM = measure_distance(17, 23)
+            distanceFR = measure_distance(27, 24)
+            counter += 1
+            if counter == 9:
+                print("cannot go this way")
+                break
+        execute_command(fwd, 1.8)
+        execute_command(left, 2*counter*10)
+        execute_command(fwd,1.8)
+        execute_command(right,counter*10)
     else:
         print("cannot move forward, please pick up")
     
