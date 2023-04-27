@@ -4,21 +4,24 @@ import csv
 import RPi.GPIO as GPIO
 # The purpose of this code is to test whether or not the rover can be given instructions from a .csv file
 GPIO.setmode(GPIO.BCM)
-GPIO.setup(4, GPIO.OUT)#front
-GPIO.setup(17, GPIO.OUT)#left
-GPIO.setup(27, GPIO.OUT)#right
-GPIO.setup(22, GPIO.OUT)#back
+GPIO.setup(4, GPIO.OUT)#front left
+GPIO.setup(17, GPIO.OUT)#front middle
+GPIO.setup(27, GPIO.OUT)#front right
+GPIO.setup(22, GPIO.OUT)#left front
+GPIO.setup(5, GPIO.OUT)#left back
+GPIO.setup(6, GPIO.OUT)#right front
+GPIO.setup(13, GPIO.OUT)#right back
+GPIO.setup(19, GPIO.OUT)#back middle
 
-
-GPIO.setup(5, GPIO.IN)#Front left
-GPIO.setup(6, GPIO.IN)#front Middle
-GPIO.setup(13, GPIO.IN)#Front Right
-GPIO.setup(19, GPIO.IN)#Left Front
-GPIO.setup(26, GPIO.IN)#Left Back
-GPIO.setup(21, GPIO.IN)#Right Front
+GPIO.setup(18, GPIO.IN)#Front left
+GPIO.setup(23, GPIO.IN)#front Middle
+GPIO.setup(24, GPIO.IN)#Front Right
+GPIO.setup(25, GPIO.IN)#Left Front
+GPIO.setup(12, GPIO.IN)#Left Back
+GPIO.setup(16, GPIO.IN)#Right Front
 GPIO.setup(20, GPIO.IN)#Right Back
-GPIO.setup(16, GPIO.IN)#Back Left
-GPIO.setup(12, GPIO.IN)#Back Right
+GPIO.setup(21, GPIO.IN)#Back middle
+
 
 def measure_distance(TRIG_PIN, ECHO_PIN):
     # send a pulse to the sensor
@@ -75,10 +78,10 @@ def execute_command(direction, duration):
         ser.write(b'\x7F\xE3')
         x=duration
         while duration > 0:
-            #distanceFL = measure_distance(4, 5)
-            distanceFM = measure_distance(4, 6)
-            #distanceFR = measure_distance(4, 13)
-            #if distanceFL or distanceFM or distanceFR < 50:
+            distanceFL = measure_distance(4, 18)
+            distanceFM = measure_distance(17, 23)
+            distanceFR = measure_distance(27, 24)
+            if distanceFL or distanceFM or distanceFR < 50:
             if distanceFM < 50:
                 ser.write(b'\x00\x00')
                 print("Object detected within operation: forwards")
@@ -90,9 +93,8 @@ def execute_command(direction, duration):
         ser.write(b'\x01\x00\x32\x00')
         x=duration
         while duration > 0:
-            distanceBL = measure_distance(22, 16)#use different gpio pins for back
-            distanceBR = measure_distance(22, 12)
-            if distanceBL or distanceBR < 50:
+            distanceBM = measure_distance(19, 21)#use different gpio pins for back
+            if distanceBM < 50:
                 ser.write(b'\x00\x00')
                 print("Object detected within operation: backwards")
             duration -= 0.1
@@ -102,8 +104,8 @@ def execute_command(direction, duration):
         duration = 0.0088*duration  # Calculate the time it takes to turn right by x degrees
         x=duration
         while duration > 0:
-            distanceRF = measure_distance(27, 21)
-            distanceRB = measure_distance(27, 20)
+            distanceRF = measure_distance(6, 16)
+            distanceRB = measure_distance(13, 20)
             if distanceRF or distanceRB < 50:
                 ser.write(b'\x00\x00')
                 print("Object detected within operation: turn right")
@@ -114,8 +116,8 @@ def execute_command(direction, duration):
         duration = 0.0088*duration  # Calculate the time it takes to turn left by x degrees
         x=duration
         while duration > 0:
-            distanceLF = measure_distance(17, 19)
-            distanceLB = measure_distance(17, 26)
+            distanceLF = measure_distance(22, 25)
+            distanceLB = measure_distance(5, 12)
             if distanceLF or distanceLB < 50:
                 ser.write(b'\x00\x00')
                 print("Object detected within operation: turn left")
